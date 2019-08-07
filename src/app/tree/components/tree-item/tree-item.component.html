@@ -1,0 +1,8 @@
+<article>
+  <div class="tree-item-header" [ngStyle]="{color: definition?.content.color || 'black'}">
+    TreeItem [{{id}}] - {{definition?.content.text}}
+  </div>
+  <div *ngIf="definition?.childIds.length" style="padding-left: 20px">
+    <app-tree-item *ngFor="let childId of definition?.childIds" [id]="childId"></app-tree-item>
+  </div>
+</article>
