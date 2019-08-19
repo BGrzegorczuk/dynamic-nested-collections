@@ -6,7 +6,7 @@ import { LoadTreeItems } from './store/tree-item.actions';
 import { treeItemsDB } from './DB/fakeDB';
 import { ITreeItem } from './store/tree-item.model';
 import { TreeItemsService } from './services/tree-items.service';
-import {filter, map} from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tree',
@@ -36,6 +36,6 @@ export class TreeComponent implements OnInit {
       });
 
     // fake API request
-    this.store.dispatch(new LoadTreeItems({ treeItems: treeItemsDB }));
+    this.store.dispatch(new LoadTreeItems({ treeItems: treeItemsDB as ITreeItem[] }));
   }
 }

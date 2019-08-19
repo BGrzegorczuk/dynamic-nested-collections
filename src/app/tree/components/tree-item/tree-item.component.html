@@ -1,8 +1,36 @@
-<article>
-  <div class="tree-item-header" [ngStyle]="{color: definition?.content.color || 'black'}">
-    TreeItem [{{id}}] - {{definition?.content.text}}
+<article *ngIf="definition" [ngSwitch]="definition.type">
+
+  <div *ngSwitchCase="TreeItemTypes.GROUP">
+    <div class="tree-item-header" [ngStyle]="{ color: definition.state.color }">
+      TreeItem [{{id}}] - {{definition.state.text}}
+    </div>
+    <mat-tab-group
+      dynamicHeight
+      *ngIf="definition.childIds.length"
+      style="padding-left: 20px"
+      [selectedIndex]="activeChildIndex"
+      (selectedTabChange)="onTabChange($event)"
+    >
+      <mat-tab
+        label="Label for {{childId}}"
+        *ngFor="let childId of definition.childIds"
+      >
+        <app-tree-item [id]="childId"></app-tree-item>
+      </mat-tab>
+    </mat-tab-group>
   </div>
-  <div *ngIf="definition?.childIds.length" style="padding-left: 20px">
-    <app-tree-item *ngFor="let childId of definition?.childIds" [id]="childId"></app-tree-item>
+
+  <div *ngSwitchDefault>
+    <div class="tree-item-header" [ngStyle]="{ color: definition.state.color }">
+      TreeItem [{{id}}] - {{definition.state.text}}
+    </div>
+    <div *ngIf="definition.childIds.length" style="padding-left: 20px">
+      <app-tree-item
+        *ngFor="let childId of definition.childIds"
+        [id]="childId"
+      >
+      </app-tree-item>
+    </div>
   </div>
+
 </article>

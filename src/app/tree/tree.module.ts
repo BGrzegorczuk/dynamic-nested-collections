@@ -5,6 +5,8 @@ import { TreeComponent } from './tree.component';
 import * as fromTreeReducer from './store/tree-item.reducer';
 import { TreeItemComponent } from './components/tree-item/tree-item.component';
 import { TreeItemsService } from './services/tree-items.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [TreeComponent, TreeItemComponent],
@@ -14,7 +16,9 @@ import { TreeItemsService } from './services/tree-items.service';
     StoreModule.forFeature(
       fromTreeReducer.treeItemsFeatureKey,
       fromTreeReducer.reducer
-    )
+    ),
+    MatTabsModule,
+    DragDropModule
   ],
   providers: [TreeItemsService]
 })

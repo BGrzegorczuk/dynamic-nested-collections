@@ -1,0 +1,8 @@
+- how to handle default values for state? (class instead of interface? where to initialize it? should it have public API methods?)
+
+- handle styles for components - ORIENTATION, tabs, etc.
+- how to handle using class (with default values) instead of interface ??
+- how to handle active state? (should I handle active item or activeChildren)
+- handle traversing al active children & triggering refresh/resize event on them?
+
+- add (nested) D&D mechanism - start with the easiest version

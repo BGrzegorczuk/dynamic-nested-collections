@@ -1,11 +1,11 @@
-import { ITreeItem } from '../store/tree-item.model';
+import {ITreeItem, TreeItemTypes} from '../store/tree-item.model';
 
-export const treeItemsDB: ITreeItem[] = [
+export const treeItemsDB: Partial<ITreeItem>[] = [
   {
     id: '1',
     parentId: null,
     childIds: [],
-    content: {
+    state: {
       text: 'Aaaaaaa'
     }
   },
@@ -13,15 +13,17 @@ export const treeItemsDB: ITreeItem[] = [
     id: '2',
     parentId: null,
     childIds: ['3', '4'],
-    content: {
-      text: 'Bbbbbbb'
-    }
+    state: {
+      text: 'Bbbbbbb',
+      activeChildIndex: 1
+    },
+    type: TreeItemTypes.GROUP
   },
   {
     id: '3',
     parentId: '2',
     childIds: [],
-    content: {
+    state: {
       text: 'Ccccccc'
     }
   },
@@ -29,7 +31,7 @@ export const treeItemsDB: ITreeItem[] = [
     id: '4',
     parentId: '2',
     childIds: ['5'],
-    content: {
+    state: {
       text: 'DDDD'
     }
   },
@@ -37,15 +39,17 @@ export const treeItemsDB: ITreeItem[] = [
     id: '5',
     parentId: '4',
     childIds: ['6', '7'],
-    content: {
-      text: 'EEEEE'
-    }
+    state: {
+      text: 'EEEEE',
+      activeChildIndex: 1
+    },
+    type: TreeItemTypes.GROUP
   },
   {
     id: '6',
     parentId: '5',
     childIds: ['8'],
-    content: {
+    state: {
       text: 'FFFFFFFF'
     }
   },
@@ -53,7 +57,7 @@ export const treeItemsDB: ITreeItem[] = [
     id: '7',
     parentId: '5',
     childIds: ['9'],
-    content: {
+    state: {
       text: 'GGGGGGGG'
     }
   },
@@ -61,7 +65,7 @@ export const treeItemsDB: ITreeItem[] = [
     id: '8',
     parentId: '6',
     childIds: [],
-    content: {
+    state: {
       text: 'HHHHHHH'
     }
   },
@@ -69,7 +73,7 @@ export const treeItemsDB: ITreeItem[] = [
     id: '9',
     parentId: '7',
     childIds: [],
-    content: {
+    state: {
       text: 'IIIIIIII'
     }
   }
