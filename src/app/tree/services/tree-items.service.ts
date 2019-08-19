@@ -7,7 +7,7 @@ import { remove } from 'lodash';
 import { ITreeState } from '../store/tree-item.reducer';
 import * as fromTreeActions from '../store/tree-item.actions';
 import * as fromTreeSelectors from '../store/tree-item.selectors';
-import { ITreeItem } from '../store/tree-item.model';
+import { ITreeItem, ITreeItemState } from '../store/tree-item.model';
 
 @Injectable()
 export class TreeItemsService {
@@ -22,7 +22,7 @@ export class TreeItemsService {
       );
   }
 
-  updateItemContent(itemId: string, changes: Partial<ITreeItem>) {
+  updateItemState(itemId: string, stateChanges: Partial<ITreeItemState>) {
     const item = this.treeEntities[itemId];
 
     if (!item) {
@@ -34,9 +34,9 @@ export class TreeItemsService {
         treeItem: {
           id: itemId,
           changes: {
-            content: {
-              ...item.content,
-              ...changes
+            state: {
+              ...item.state,
+              ...stateChanges
             }
           }
         }
@@ -46,7 +46,6 @@ export class TreeItemsService {
 
   // TODO: handle moving to root item (null parentId)
   moveItem(movedItemId, newParentId) {
-
     const movedEntity = this.treeEntities[movedItemId];
     const moveToRoot = newParentId === null;
     const moveFromRoot = movedEntity.parentId === null;
@@ -60,10 +59,9 @@ export class TreeItemsService {
     //  - particular item can be "moved" to the same parent only once (uniqueness)
     //  - check if moved item exists in given parent
     //  - avoid circularity
-    const operationInvalid = (
+    const operationInvalid =
       newParentEntity.childIds.indexOf(movedItemId) >= 0 ||
-      (oldParentEntity && oldParentEntity.childIds.indexOf(movedItemId) < 0)
-    );
+      (oldParentEntity && oldParentEntity.childIds.indexOf(movedItemId) < 0);
 
     if (operationInvalid) {
       return alert('Operation Invalid');
@@ -79,10 +77,7 @@ export class TreeItemsService {
       {
         id: newParentId,
         changes: {
-          childIds: [
-            ...newParentEntity.childIds,
-            movedItemId
-          ]
+          childIds: [...newParentEntity.childIds, movedItemId]
         }
       }
     ];
@@ -92,9 +87,12 @@ export class TreeItemsService {
       updatedTreeItems.push({
         id: oldParentEntity.id,
         changes: {
-          childIds: remove([...oldParentEntity.childIds], (cid) => cid !== movedItemId)
+          childIds: remove(
+            [...oldParentEntity.childIds],
+            cid => cid !== movedItemId
+          )
         }
-      })
+      });
     }
 
     this.store.dispatch(
@@ -102,5 +100,68 @@ export class TreeItemsService {
         treeItems: updatedTreeItems
       })
     );
+  }
+
+  /* Returns all visible item down the tree, to the very bottom */
+  traverseAllChildren(itemId: string): ITreeItem[] {
+    const treeEntities = this.treeEntities;
+    const firstItem = treeEntities[itemId];
+    const allChildren = [];
+
+    // tslint:disable-next-line:variable-name
+    function _getChildren(parentItem: ITreeItem) {
+      for (const id of parentItem.childIds) {
+        const item = treeEntities[id];
+        allChildren.push(item);
+        _getChildren(item);
+      }
+
+      return allChildren;
+    }
+
+    return _getChildren(firstItem);
+  }
+
+  /* Returns all visible item down the tree, to the very bottom */
+  traverseAllActiveChildren(itemId: string): ITreeItem[] {
+    const treeEntities = this.treeEntities;
+    const firstItem = treeEntities[itemId];
+    const activeChildren = [];
+    const getActiveChildFn = this.getActiveChild.bind(this);
+
+    // tslint:disable-next-line:variable-name
+    function _getActiveChildren(parentItem: ITreeItem) {
+      const activeChild = getActiveChildFn(parentItem.id);
+
+      if (activeChild) {
+        activeChildren.push(activeChild);
+        return _getActiveChildren(activeChild);
+      } else {
+        return activeChildren;
+      }
+    }
+
+    return _getActiveChildren(firstItem);
+  }
+
+  getItemChildren(itemId: string) {
+    const childIds = this.treeEntities[itemId].childIds;
+    return childIds.map(id => this.treeEntities[id]);
+  }
+
+  getActiveChildIndex(parentItemId: string): number {
+    const parentItem = this.treeEntities[parentItemId];
+    return parentItem.state.activeChildIndex || 0;
+  }
+
+  getActiveChildId(parentItemId: string): string {
+    return this.getActiveChild(parentItemId).id;
+  }
+
+  getActiveChild(parentItemId: string) {
+    const parentItem = this.treeEntities[parentItemId];
+    const activeChildIndex = this.getActiveChildIndex(parentItemId);
+    const childItemId = parentItem.childIds[activeChildIndex];
+    return this.treeEntities[childItemId];
   }
 }
